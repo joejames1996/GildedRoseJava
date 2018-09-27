@@ -8,6 +8,9 @@ public class ItemType extends Item
     private TypeOfItem typeOfItem;
     private int qualityChange;
 
+    private int maxQuality = 50;
+    private int minQuality = 0;
+
     public ItemType(String name, int sellIn, int quality, TypeOfItem typeOfItem)
     {
         super(name, sellIn, quality);
@@ -15,6 +18,7 @@ public class ItemType extends Item
         this.sellIn = super.sellIn;
         this.quality = super.quality;
         this.typeOfItem = typeOfItem;
+        this.maxQuality = typeOfItem == TypeOfItem.SULFURAS ? 80 : maxQuality;
         calculateQualityChange();
     }
 
@@ -32,10 +36,12 @@ public class ItemType extends Item
     {
         int q = 0;
         int s = this.sellIn;
+        int qualityRate = s >= 0 ? 1 : 2;
+
         switch(this.typeOfItem)
         {
             case AGED_BRIE:
-                q++;
+                q += 1 * qualityRate;
                 break;
             case BACKSTAGE_PASS:
                 if(s < 5) q += 3;
@@ -46,8 +52,18 @@ public class ItemType extends Item
                 this.quality = 80;
                 break;
             case OTHER_TYPE:
-                q--;
+                q -= 1 * qualityRate;
                 break;
+        }
+        if (this.getQuality() + q > maxQuality)
+        {
+            this.setQuality(maxQuality);
+            q = 0;
+        }
+        else if (this.getQuality() + q < minQuality)
+        {
+            this.setQuality(minQuality);
+            q = 0;
         }
         setQualityChange(q);
     }
