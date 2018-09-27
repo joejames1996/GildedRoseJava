@@ -1,6 +1,6 @@
 package training.gildedrose;
 
-public class ItemType extends Item
+public class ItemWithType extends Item
 {
     private String name;
     private int sellIn;
@@ -11,7 +11,7 @@ public class ItemType extends Item
     private int maxQuality = 50;
     private int minQuality = 0;
 
-    public ItemType(String name, int sellIn, int quality, TypeOfItem typeOfItem)
+    public ItemWithType(String name, int sellIn, int quality, TypeOfItem typeOfItem)
     {
         super(name, sellIn, quality);
         this.name = super.name;
@@ -22,7 +22,7 @@ public class ItemType extends Item
         calculateQualityChange();
     }
 
-    public ItemType(String name, int sellIn, int quality)
+    public ItemWithType(String name, int sellIn, int quality)
     {
         super(name, sellIn, quality);
         this.name = super.name;
@@ -36,7 +36,7 @@ public class ItemType extends Item
     {
         int q = 0;
         int s = this.sellIn;
-        int qualityRate = s >= 0 ? 1 : 2;
+        int qualityRate = s > 0 ? 1 : 2;
 
         switch(this.typeOfItem)
         {
@@ -44,9 +44,9 @@ public class ItemType extends Item
                 q += 1 * qualityRate;
                 break;
             case BACKSTAGE_PASS:
-                if(s < 5) q += 3;
-                else if(s < 10) q += 2;
-                else q -= this.quality;
+                if(s <= 0) q -= this.quality;
+                else if(s <= 5) q += 3;
+                else if(s <= 10) q += 2;
                 break;
             case SULFURAS:
                 this.quality = 80;
@@ -57,12 +57,12 @@ public class ItemType extends Item
         }
         if (this.getQuality() + q > maxQuality)
         {
-            this.setQuality(maxQuality);
+            setQuality(maxQuality);
             q = 0;
         }
         else if (this.getQuality() + q < minQuality)
         {
-            this.setQuality(minQuality);
+            setQuality(minQuality);
             q = 0;
         }
         setQualityChange(q);
@@ -71,6 +71,7 @@ public class ItemType extends Item
     public void setName(String name)
     {
         this.name = name;
+        super.name = name;
     }
 
     public String getName()
@@ -81,6 +82,7 @@ public class ItemType extends Item
     public void setSellIn(int sellIn)
     {
         this.sellIn = sellIn;
+        super.sellIn = sellIn;
     }
 
     public int getSellIn()
@@ -91,6 +93,7 @@ public class ItemType extends Item
     public void setQuality(int quality)
     {
         this.quality = quality;
+        super.quality = quality;
     }
 
     public int getQuality()
@@ -116,5 +119,27 @@ public class ItemType extends Item
     public int getQualityChange()
     {
         return qualityChange;
+    }
+
+    public void updateQuality()
+    {
+        this.calculateQualityChange();
+        int currentQuality = this.getQuality();
+        int qualityChange = this.getQualityChange();
+        this.setQuality(currentQuality + qualityChange);
+    }
+
+    public void updateSellIn()
+    {
+        if(this.typeOfItem != TypeOfItem.SULFURAS)
+        {
+            if(this.getSellIn() > 0)
+                this.setSellIn(this.getSellIn() - 1);
+        }
+    }
+
+    @Override
+    public String toString() {
+        return this.name + ", " + this.sellIn + ", " + this.quality;
     }
 }
